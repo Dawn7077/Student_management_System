@@ -1,0 +1,47 @@
+export interface IPlayable{
+    getRoleDetails():string;
+}
+
+export abstract class SystemUser implements IPlayable{//A top-level 'export' modifier cannot be used on value declarations in a CommonJS module when 'verbatimModuleSyntax' is enabled.
+    protected lastLogin: Date
+
+    constructor(
+        public readonly id:string,
+        public name:string,
+        private email:string
+    ){
+        this.lastLogin = new Date()
+    }
+
+    public getEmail():string{
+        return this.email;
+    }
+
+    abstract getRoleDetails():string;
+
+}
+
+export class Student extends SystemUser{//A top-level 'export' modifier cannot be used on value declarations in a CommonJS module when 'verbatimModuleSyntax' is enabled.
+    constructor(
+        id:string,
+        name:string,
+        email:string,
+        public grade:string
+    ){
+        super(id, name, email)
+    }
+
+    public getRoleDetails():string{
+        return `Student: ${this.name}, | Grade: ${this.grade}`;
+    }
+}
+
+export interface IUserSchemaData {
+    id:string;
+    name:string;
+    email:string;
+    grade:string;
+}
+
+export type CreateStudentDTO  = Pick<IUserSchemaData, 'name'|'email'|'grade'>;
+export type UpdateStudentDTO = Partial<Omit<IUserSchemaData, 'id'| 'email'>>;

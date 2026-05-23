@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+    <style>
+        #studentForm {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 15px;
+        }
+        #adminForm{
+            border: 1px solid #ccc;
+            margin: 15px;
+            padding: 10px;
+        }
+    </style>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Student Management System</h1>
+    <p>Welcome to the Student Management System</p>
+
+    <div id="studentForm">
+        <div class="form">
+            <button onclick="window.location.href='/'">Go Back</button>
+            <input type="text" id="name" placeholder="Enter your name">
+            <input type="text" id="email" placeholder="Enter your email">
+            <input type="text" id="course" placeholder="Enter your course">
+            <button onclick="submitData()">Submit</button>
+        </div>
+
+        <input type="text" id="searchName" placeholder="Search by Name">
+        <button onclick="SearchByName()">Search</button>
+        <div id="searchResult"> 
+        </div>
+    </div>
+
+
+    <div id="adminForm">
+            <div class="form">
+                <button onclick="window.location.href='/'">Go Back</button>
+                <input type="text" id="adminName" placeholder="Enter admin name">
+                <input type="text" id="adminEmail" placeholder="Enter admin email">
+                <input type="text" id="adminAccess" placeholder="Enter admin access level">
+                <button onclick="submitAdminData()">Submit Admin Data</button>
+            </div>
+
+            <input type="text" id="searchAdminName" placeholder="Search Admin by Name">
+            <button onclick="SearchAdminByName()">Search Admin</button>
+            <div id="searchAdminResult">
+            </div>
+    </div>
+
+    
+
+   
+
+
+    <button onclick="getAllStudents()">Get All Students</button>
+    <button onclick="getAllAdmins()">Get All Admins</button>
+
+    <script>
+// admin functions
+        async function getAllAdmins(){
+            try{
+                document.getElementById('searchAdminResult').innerHTML = ''
+                const response = await fetch('/adminsAll')
+                const result = await response.json()
+                if(result.success){
+                    result.admins.forEach(admin =>{
+                        const adminInfo = document.createElement('p')
+                        adminInfo.textContent = `Details: ${admin}`
+                        document.getElementById('searchAdminResult').appendChild(adminInfo)
+                    })
+                }
+                else{
+                    alert('Failed to fetch all admins');
+                }
+
+            }
+            catch(error){
+                console.error('Error fetching all admins:', error);
+                alert('An error occurred while fetching all admins');
+            }
+        
+        }
+
+
+        async function submitAdminData() {
+           try {
+            const name = document.getElementById('adminName').value;
+            const email = document.getElementById('adminEmail').value;
+            const access = document.getElementById('adminAccess').value;
+
+            if (!name || !email || !access) {
+                alert('Please fill in all fields');
+                return;
+            }
+            const data = { name, email, access };
+
+            const response = await fetch('/admin',{
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body:JSON.stringify(data)
+            })
+
+            const result  = await response.json()
+            if(result.success){
+                alert('Admin info submitted successfully');
+            } else {
+                console.error('Failed to submit admin data:', result.message);
+                alert('Failed to submit admin data');
+            } 
+           } catch (error) {
+            console.error('Error submitting admin data:', error);
+            alert('An error occurred while submitting admin data', error);
+           }
+
+        }
+
+        async function SearchAdminByName(){
+            try{
+                const name = document.getElementById('searchAdminName').value
+                if(!name) {
+                    alert('Please enter a name to search');
+                    return;
+                }
+
+                const response  = await fetch(`/admin/${name}`)
+                const result = await response.json()
+                if(result.success){
+                    document.getElementById('searchAdminResult').innerHTML = `
+                        <p>Details: ${result.adminDetails}</p>
+                    `
+                }else{
+                    document.getElementById('searchAdminResult').innerHTML = `
+                        <p>Admin not found</p>
+                    ` 
+                }
+
+            }
+            catch(error){
+                console.error('Error searching admin by name:', error);
+                alert('An error occurred while searching admin by name');
+            }
+        }
+
+// student  functions
+        async function submitData() {
+           try {
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const course = document.getElementById('course').value;
+
+            if (!name || !email || !course) {
+                alert('Please fill in all fields');
+                return;
+            }
+            const data = { name, email, course };
+
+            const response = await fetch('/student',{
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body:JSON.stringify(data)
+            })
+
+            const result  = await response.json()
+            if(result.success){
+                alert('Student info submitted successfully');
+            } else {
+                console.error('Failed to submit data:', result.message);
+                alert('Failed to submit data');
+            } 
+           } catch (error) {
+            console.error('Error submitting data:', error);
+            alert('An error occurred while submitting data');
+           }
+
+        }
+    
+        async function SearchByName(){
+            try{
+                const name = document.getElementById('searchName').value
+                if(!name) {
+                    alert('Please enter a name to search');
+                    return;
+                }
+
+                const response  = await fetch(`/students/${name}`)
+                const result = await response.json()
+                if(result.success){
+                    document.getElementById('searchResult').innerHTML = `
+                        <p>Details: ${result.studentDetails}</p>
+                    `
+                }else{
+                    document.getElementById('searchResult').innerHTML = `
+                        <p>Student not found</p>
+                    ` 
+                }
+
+            }
+            catch(error){
+                console.error('Error searching by name:', error);
+                alert('An error occurred while searching by name');
+            }
+        }
+        
+        async function getAllStudents(){
+            try{
+                document.getElementById('searchResult').innerHTML = ''
+                const response = await fetch('/studentsAll')
+                const result = await response.json()
+                if(result.success){
+                    result.students.forEach(student =>{
+                        const studentInfo = document.createElement('p')
+                        studentInfo.textContent = `Details: ${student}`
+                        document.getElementById('searchResult').appendChild(studentInfo)
+                    })
+                }
+                else{
+                    alert('Failed to fetch all students');
+                }
+
+            }
+            catch(error){
+                console.error('Error fetching all students:', error);
+                alert('An error occurred while fetching all students');
+            }
+        
+        }
+    </script>
+
+</body>
+</html>
